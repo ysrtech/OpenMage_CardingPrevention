@@ -26,6 +26,10 @@ class YSRTech_CardingPrevention_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_CHALLENGE_MIN    = 'cardingprevention/breaker/challenge_minutes';
     const XML_TURNSTILE_SELECT = 'cardingprevention/breaker/payment_form_selector';
 
+    // Config paths owned by fballiano/openmage-cloudflare-turnstile.
+    const TURNSTILE_PATH_SITE_KEY   = 'admin/fballiano_turnstile/site_key';
+    const TURNSTILE_PATH_SECRET_KEY = 'admin/fballiano_turnstile/secret_key';
+
     const ACTION_BLOCK     = 'block';
     const ACTION_TURNSTILE = 'turnstile';
 
@@ -109,18 +113,26 @@ class YSRTech_CardingPrevention_Helper_Data extends Mage_Core_Helper_Abstract
 
         $this->turnstileAvailable = false;
 
-        if (!Mage::helper('core')->isModuleEnabled('Fballiano_Turnstile')) {
+        if (!Mage::helper('core')->isModuleEnabled('Fballiano_Turnstile')
+            || !class_exists('Fballiano_Turnstile_Helper_Data')
+        ) {
             return $this->turnstileAvailable;
         }
 
-        $turnstile = Mage::helper('fballiano_turnstile');
-        if (!$turnstile instanceof Fballiano_Turnstile_Helper_Data) {
-            return $this->turnstileAvailable;
-        }
-
-        $this->turnstileAvailable = $turnstile->getSiteKey() !== '' && $turnstile->getSecretKey() !== '';
+        // Read the stored values directly rather than through that module's
+        // getSiteKey()/getSecretKey(). Both declare a string return type but
+        // hand back Mage::getStoreConfig() unchecked, which is null until the
+        // keys have been saved — calling them before setup throws a TypeError
+        // and takes the admin config page down with it.
+        $this->turnstileAvailable = $this->getTurnstileConfig(self::TURNSTILE_PATH_SITE_KEY) !== ''
+            && $this->getTurnstileConfig(self::TURNSTILE_PATH_SECRET_KEY) !== '';
 
         return $this->turnstileAvailable;
+    }
+
+    protected function getTurnstileConfig(string $path): string
+    {
+        return trim((string) Mage::getStoreConfig($path));
     }
 
     /**
@@ -135,7 +147,7 @@ class YSRTech_CardingPrevention_Helper_Data extends Mage_Core_Helper_Abstract
     public function getTurnstileSiteKey(): string
     {
         return $this->isTurnstileAvailable()
-            ? Mage::helper('fballiano_turnstile')->getSiteKey()
+            ? $this->getTurnstileConfig(self::TURNSTILE_PATH_SITE_KEY)
             : '';
     }
 
@@ -149,7 +161,15 @@ class YSRTech_CardingPrevention_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        return Mage::helper('fballiano_turnstile')->verify($token, $this->getClientIp());
+        try {
+            return Mage::helper('fballiano_turnstile')->verify($token, $this->getClientIp());
+        } catch (Throwable $e) {
+            // Never let a problem inside the Turnstile module surface as a
+            // fatal error in the middle of someone's checkout.
+            $this->log('Turnstile verification threw', ['error' => $e->getMessage()]);
+
+            return false;
+        }
     }
 
     /**

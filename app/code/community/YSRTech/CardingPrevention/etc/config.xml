@@ -2,7 +2,7 @@
 <config>
     <modules>
         <YSRTech_CardingPrevention>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </YSRTech_CardingPrevention>
     </modules>
     <global>
