@@ -1,0 +1,19 @@
+{
+    "name": "ysrtech/openmage-carding-prevention",
+    "description": "Rate-limits one-page checkout order and payment submissions in OpenMage/Magento 1 to stop card-testing (carding) runs.",
+    "type": "magento-module",
+    "license": "MIT",
+    "keywords": ["openmage", "magento1", "carding", "fraud", "checkout", "rate-limit"],
+    "authors": [
+        {
+            "name": "YSR Tech"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0",
+        "magento-hackathon/magento-composer-installer": "*"
+    },
+    "extra": {
+        "magento-root-dir": "./"
+    }
+}

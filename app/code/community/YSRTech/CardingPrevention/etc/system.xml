@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <ysrtech translate="label">
+            <label>YSR Tech</label>
+            <sort_order>320</sort_order>
+        </ysrtech>
+    </tabs>
+    <sections>
+        <cardingprevention translate="label">
+            <label>Carding Prevention</label>
+            <tab>ysrtech</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>10</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <general translate="label">
+                    <label>General</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enabled translate="label comment">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+                        <action translate="label comment">
+                            <label>When a limit is exceeded</label>
+                            <comment><![CDATA[<b>Block</b> refuses the address outright. <b>Require Turnstile</b> keeps checkout open but demands a solved challenge on every payment and order submission until the challenge window expires — this needs the Fballiano_Turnstile module installed with its site and secret keys set, and falls back to blocking if it is missing.]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>cardingprevention/system_config_source_action</source_model>
+                            <sort_order>15</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </action>
+                        <log_only translate="label comment">
+                            <label>Log Only (do not block)</label>
+                            <comment>Run in observation mode first. Attempts are logged but never blocked.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </log_only>
+                        <log_enabled translate="label comment">
+                            <label>Write to var/log/carding_prevention.log</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </log_enabled>
+                        <trust_cf_header translate="label comment">
+                            <label>Trust CF-Connecting-IP header</label>
+                            <comment>Enable when the site is behind Cloudflare and the web server does not already restore the real visitor IP.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </trust_cf_header>
+                        <whitelist_ips translate="label comment">
+                            <label>Never throttle these IPs</label>
+                            <comment>Comma separated. Office IPs, monitoring, test runners.</comment>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </whitelist_ips>
+                    </fields>
+                </general>
+                <limits translate="label">
+                    <label>Limits</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <order_attempts_session translate="label comment">
+                            <label>Max order attempts per checkout session</label>
+                            <comment>Counts POSTs to checkout/onepage/saveOrder. A real shopper rarely needs more than 3.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </order_attempts_session>
+                        <order_attempts_ip translate="label comment">
+                            <label>Max order attempts per IP per window</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </order_attempts_ip>
+                        <payment_attempts_ip translate="label comment">
+                            <label>Max payment-method saves per IP per window</label>
+                            <comment>Counts POSTs to checkout/onepage/savePayment. Keep this higher than the order limit; legitimate shoppers do switch payment methods.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_attempts_ip>
+                        <login_attempts_ip translate="label comment">
+                            <label>Max login attempts per IP per window</label>
+                            <comment>Counts POSTs to customer/account/loginPost, the forgot-password form and AjaxLogin. Successful logins reset the counter, so only failures accumulate.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>35</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </login_attempts_ip>
+                        <window_minutes translate="label comment">
+                            <label>Counting window (minutes)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </window_minutes>
+                        <block_minutes translate="label comment">
+                            <label>Block duration (minutes)</label>
+                            <comment>How long an IP stays blocked from checkout once it trips a limit.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </block_minutes>
+                    </fields>
+                </limits>
+                <breaker translate="label comment">
+                    <label>Store-wide breaker (adaptive challenge)</label>
+                    <comment><![CDATA[Per-IP and per-session limits cap each identity, but an attacker rotating addresses simply pays the limit again for each one. This counts order attempts across the whole store: above the threshold, every checkout is challenged until the window expires. Needs the action above set to <b>Require Turnstile</b> — the breaker never blocks, since that would close the store.]]></comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>30</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enabled translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+                        <orders_per_window translate="label comment">
+                            <label>Store-wide order attempts before challenging everyone</label>
+                            <comment>Set this well above a normal trading hour but far below an attack. Check Reports to see your real hourly peak first.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </orders_per_window>
+                        <challenge_minutes translate="label comment">
+                            <label>Challenge window (minutes)</label>
+                            <comment>How long Turnstile stays required after a limit or the breaker trips.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </challenge_minutes>
+                        <payment_form_selector translate="label comment">
+                            <label>Payment form CSS selector</label>
+                            <comment>Where the widget is injected. Comma separated, first match wins. The default covers stock one-page checkout and FireCheckout.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_form_selector>
+                    </fields>
+                </breaker>
+            </groups>
+        </cardingprevention>
+    </sections>
+</config>

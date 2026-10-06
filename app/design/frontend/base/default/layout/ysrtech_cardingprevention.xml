@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <!--
+        The block renders nothing unless challenge mode is active, so it is safe
+        to add on every checkout page. It is placed in before_body_end rather
+        than inside the payment block because the payment step is loaded by
+        AJAX: the template moves itself into the payment form once that exists.
+    -->
+    <checkout_onepage_index>
+        <reference name="before_body_end">
+            <block type="cardingprevention/turnstile" name="cardingprevention.turnstile"
+                   template="ysrtech_cardingprevention/turnstile.phtml"/>
+        </reference>
+    </checkout_onepage_index>
+    <firecheckout_index_index>
+        <reference name="before_body_end">
+            <block type="cardingprevention/turnstile" name="cardingprevention.turnstile.firecheckout"
+                   template="ysrtech_cardingprevention/turnstile.phtml"/>
+        </reference>
+    </firecheckout_index_index>
+    <onestepcheckout_index_index>
+        <reference name="before_body_end">
+            <block type="cardingprevention/turnstile" name="cardingprevention.turnstile.osc"
+                   template="ysrtech_cardingprevention/turnstile.phtml"/>
+        </reference>
+    </onestepcheckout_index_index>
+</layout>

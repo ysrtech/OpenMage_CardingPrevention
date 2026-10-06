@@ -1,0 +1,5 @@
+app/code/community/YSRTech/CardingPrevention                      app/code/community/YSRTech/CardingPrevention
+app/etc/modules/YSRTech_CardingPrevention.xml                     app/etc/modules/YSRTech_CardingPrevention.xml
+app/locale/en_US/YSRTech_CardingPrevention.csv                    app/locale/en_US/YSRTech_CardingPrevention.csv
+app/design/frontend/base/default/layout/ysrtech_cardingprevention.xml      app/design/frontend/base/default/layout/ysrtech_cardingprevention.xml
+app/design/frontend/base/default/template/ysrtech_cardingprevention       app/design/frontend/base/default/template/ysrtech_cardingprevention

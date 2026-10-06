@@ -1,0 +1,91 @@
+<?php
+/**
+ * @var YSRTech_CardingPrevention_Block_Turnstile $this
+ *
+ * Renders the Turnstile widget inside the checkout payment form. Magento's
+ * review step serialises that form when it posts saveOrder, so the token
+ * travels with both savePayment and saveOrder without touching core JS.
+ */
+if (!$this->canShow()) {
+    return;
+}
+?>
+<div id="ysr-carding-turnstile" style="margin:10px 0;"></div>
+<script type="text/javascript">
+//<![CDATA[
+(function () {
+    var SITE_KEY = <?php echo Mage::helper('core')->jsonEncode($this->getSiteKey()); ?>;
+    var SELECTOR = <?php echo Mage::helper('core')->jsonEncode($this->getPaymentFormSelector()); ?>;
+    var holder   = document.getElementById('ysr-carding-turnstile');
+    var widgetId = null;
+
+    function paymentForm() {
+        var selectors = SELECTOR.split(',');
+        for (var i = 0; i < selectors.length; i++) {
+            var el = document.querySelector(selectors[i].replace(/^\s+|\s+$/g, ''));
+            if (el) {
+                return el.tagName === 'FORM' ? el : (el.closest ? el.closest('form') : el);
+            }
+        }
+        return null;
+    }
+
+    // The widget writes its hidden cf-turnstile-response input next to itself,
+    // so it has to live inside the form that gets serialised.
+    function placeHolder() {
+        var form = paymentForm();
+        if (form && holder && holder.parentNode !== form) {
+            form.appendChild(holder);
+        }
+        return !!form;
+    }
+
+    function render() {
+        if (!holder || typeof window.turnstile === 'undefined') {
+            return;
+        }
+        if (widgetId !== null) {
+            window.turnstile.reset(widgetId);
+            return;
+        }
+        widgetId = window.turnstile.render(holder, {
+            sitekey: SITE_KEY,
+            action: 'checkout'
+        });
+    }
+
+    window.ysrCardingTurnstileReady = function () {
+        placeHolder();
+        render();
+    };
+
+    // A token is single use: after every checkout POST it has to be replaced,
+    // or the shopper's second attempt fails verification.
+    if (typeof Ajax !== 'undefined' && Ajax.Responders) {
+        Ajax.Responders.register({
+            onComplete: function (response) {
+                var url = (response && response.url) ? response.url : '';
+                if (url.indexOf('savePayment') === -1 && url.indexOf('saveOrder') === -1) {
+                    return;
+                }
+                placeHolder();
+                if (widgetId !== null && typeof window.turnstile !== 'undefined') {
+                    window.turnstile.reset(widgetId);
+                }
+            }
+        });
+    }
+
+    // The payment step is loaded by AJAX, so the form may not exist yet.
+    var tries = 0;
+    var timer = setInterval(function () {
+        tries++;
+        if (placeHolder() || tries > 40) {
+            clearInterval(timer);
+            render();
+        }
+    }, 500);
+}());
+//]]>
+</script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=ysrCardingTurnstileReady&render=explicit" async defer></script>
